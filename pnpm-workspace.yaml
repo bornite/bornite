@@ -1,0 +1,8 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# Native post-install build scripts are declined; not needed for dev/typecheck.
+allowBuilds:
+  sharp: false
+  unrs-resolver: false

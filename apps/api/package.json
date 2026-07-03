@@ -1,0 +1,24 @@
+{
+  "name": "@bornite/api",
+  "version": "0.0.0",
+  "description": "Bornite backend — risk-based vulnerability management API (domain, persistence, ingestion).",
+  "license": "AGPL-3.0-or-later",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^5.9.3",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.20",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript": "^5.5.0"
+  }
+}

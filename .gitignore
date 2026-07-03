@@ -6,3 +6,11 @@ dist/
 .DS_Store
 coverage/
 *.tsbuildinfo
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+
+# Turborepo
+.turbo/
