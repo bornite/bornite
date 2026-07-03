@@ -12,34 +12,22 @@ import {
   MitigateFinding,
   RISK_ACCEPTANCE_REPOSITORY,
 } from '../../application';
-import {
-  FindingRepository,
-  RiskAcceptanceRepository,
-} from '../../domain';
-import {
-  InMemoryFindingStore,
-  InMemoryRiskAcceptanceRepository,
-} from '../database/in-memory';
+import { FindingRepository, RiskAcceptanceRepository } from '../../domain';
+import { PersistenceModule } from '../persistence';
 import { CryptoIdGenerator, SystemClock } from '../system';
 import { FindingsController } from './controllers/findings.controller';
 import { HealthController } from './controllers/health.controller';
 
 /**
- * HTTP delivery module — the NestJS wiring at the infrastructure edge. It binds
- * ports to adapters and constructs framework-agnostic use cases via factory
- * providers, so the application layer stays free of NestJS. The in-memory finding
- * store is a single instance shared by the read port and the write repository.
+ * HTTP delivery module — the NestJS wiring at the infrastructure edge. Ports are
+ * bound to adapters by {@link PersistenceModule} (Postgres or in-memory); this
+ * module builds the framework-agnostic use cases via factory providers, so the
+ * application layer stays free of NestJS.
  */
 @Module({
+  imports: [PersistenceModule.register()],
   controllers: [FindingsController, HealthController],
   providers: [
-    InMemoryFindingStore,
-    { provide: FINDING_READ_STORE, useExisting: InMemoryFindingStore },
-    { provide: FINDING_REPOSITORY, useExisting: InMemoryFindingStore },
-
-    InMemoryRiskAcceptanceRepository,
-    { provide: RISK_ACCEPTANCE_REPOSITORY, useExisting: InMemoryRiskAcceptanceRepository },
-
     { provide: ID_GENERATOR, useClass: CryptoIdGenerator },
     { provide: CLOCK, useClass: SystemClock },
 
