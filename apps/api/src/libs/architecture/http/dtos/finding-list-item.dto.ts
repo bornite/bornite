@@ -1,26 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-
-export type Severity = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | 'INFO';
-export type FindingStatus =
-  | 'OPEN'
-  | 'CONFIRMED'
-  | 'RISK_ACCEPTED'
-  | 'MITIGATED'
-  | 'RESOLVED'
-  | 'FALSE_POSITIVE';
-export type AssetType =
-  | 'HOST'
-  | 'WEB_APPLICATION'
-  | 'CONTAINER'
-  | 'CODE_REPOSITORY'
-  | 'CLOUD_RESOURCE';
-export type SourceType =
-  | 'NETWORK_SCANNER'
-  | 'SAST'
-  | 'DAST'
-  | 'SCA'
-  | 'CSPM'
-  | 'CONTAINER_SCANNER';
+import type { AssetType, FindingStatus, Severity, SourceType } from '../../../application';
 
 const SEVERITIES: Severity[] = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'INFO'];
 const STATUSES: FindingStatus[] = [
@@ -63,7 +42,7 @@ export class VulnerabilitySummaryDto {
   cve?: string;
 }
 
-/** One row of the prioritized findings worklist. */
+/** OpenAPI schema for one row of the findings worklist (mirrors FindingListItem). */
 export class FindingListItemDto {
   @ApiProperty()
   id!: string;

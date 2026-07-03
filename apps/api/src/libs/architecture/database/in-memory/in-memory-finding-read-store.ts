@@ -1,14 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { FindingListItemDto } from './dto/finding-list-item.dto';
+import { FindingListItem, FindingReadStore } from '../../../application';
 
 /**
- * In-memory read model for the findings worklist. A stand-in for the CQRS read
- * projection over Postgres — it lets the API and UI work end-to-end before the
- * database is wired. The shape it returns is the contract the web app consumes.
+ * In-memory implementation of the {@link FindingReadStore} query port — a
+ * stand-in for the Postgres read projection so the API and UI work end-to-end
+ * before the database is wired. Swap for a `PostgresFindingReadStore` later.
  */
-@Injectable()
-export class FindingsService {
-  private readonly findings: FindingListItemDto[] = [
+export class InMemoryFindingReadStore implements FindingReadStore {
+  private readonly findings: FindingListItem[] = [
     {
       id: 'f-1001',
       title: 'Apache Log4j2 remote code execution (Log4Shell)',
@@ -160,7 +158,7 @@ export class FindingsService {
     },
   ];
 
-  public list(): FindingListItemDto[] {
-    return [...this.findings].sort((a, b) => b.riskScore - a.riskScore);
+  public async listWorklist(): Promise<FindingListItem[]> {
+    return this.findings;
   }
 }

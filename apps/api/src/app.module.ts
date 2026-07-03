@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
-import { FindingsModule } from './modules/findings/findings.module';
-import { HealthModule } from './modules/health/health.module';
+import { HttpModule } from './libs/architecture/http/http.module';
 
 /**
- * Root HTTP module. This is the framework/presentation edge — it wires feature
- * modules that expose the clean core (domain/application) over REST. The core in
- * `libs/` stays free of any NestJS coupling.
+ * Composition root. The HTTP delivery layer lives in the infrastructure edge
+ * (`libs/architecture/http`); the clean core in `libs/{domain,application}` has
+ * no NestJS coupling.
  */
 @Module({
-  imports: [HealthModule, FindingsModule],
+  imports: [HttpModule],
 })
 export class AppModule {}
