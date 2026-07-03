@@ -1,5 +1,5 @@
-import { CollectionMode, Connector, NormalizedRecord, SyncContext } from '../../../application';
-import { SourceType } from '../../../domain';
+import { CollectionMode, Connector, NormalizedRecord, SyncContext } from '../../../../application';
+import { SourceType } from '../../../../domain';
 import { CheckmarxScaClient } from './checkmarx-sca.client';
 import { parseCheckmarxScaConfig } from './checkmarx-sca.config';
 import { toNormalizedRecord } from './checkmarx-sca.mapper';

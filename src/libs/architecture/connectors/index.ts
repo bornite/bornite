@@ -1,1 +1,1 @@
-export * from './checkmarx-sca';
+export * from './checkmarx';

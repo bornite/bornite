@@ -1,5 +1,5 @@
-import { AssetIdentifierKind, AssetType, SeverityLevel, VulnerabilitySystem } from '../../../domain';
-import { NormalizedRecord } from '../../../application';
+import { AssetIdentifierKind, AssetType, SeverityLevel, VulnerabilitySystem } from '../../../../domain';
+import { NormalizedRecord } from '../../../../application';
 import { CheckmarxPackage, CheckmarxProject, CheckmarxVulnerability } from './checkmarx-sca.types';
 
 const SEVERITY: Readonly<Record<string, SeverityLevel>> = {
