@@ -1,0 +1,23 @@
+{
+  "name": "@bornite/backend",
+  "version": "0.0.0",
+  "description": "Bornite — open-source risk-based vulnerability management platform (domain + persistence model layer).",
+  "license": "AGPL-3.0-or-later",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.20",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript": "^5.5.0"
+  }
+}
