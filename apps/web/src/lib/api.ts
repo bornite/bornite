@@ -9,3 +9,22 @@ export async function fetchFindings(): Promise<Finding[]> {
   }
   return (await response.json()) as Finding[];
 }
+
+async function postAction(findingId: string, action: "accept" | "mitigate"): Promise<void> {
+  const response = await fetch(`${API_URL}/findings/${findingId}/${action}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: "{}",
+  });
+  if (!response.ok) {
+    throw new Error(`Action "${action}" failed (${response.status})`);
+  }
+}
+
+export function acceptFinding(findingId: string): Promise<void> {
+  return postAction(findingId, "accept");
+}
+
+export function mitigateFinding(findingId: string): Promise<void> {
+  return postAction(findingId, "mitigate");
+}

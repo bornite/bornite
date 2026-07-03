@@ -6,6 +6,7 @@ import type { Finding, Severity } from "@/lib/findings";
 import { SeverityBadge } from "@/components/severity-badge";
 import { StatusBadge } from "@/components/status-badge";
 import { RiskMeter } from "@/components/risk-meter";
+import { FindingActions } from "@/components/finding-actions";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -94,6 +95,9 @@ export function FindingsTable({
             <TableHead>Asset</TableHead>
             <TableHead className="hidden lg:table-cell">Source</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead className="w-[48px]">
+              <span className="sr-only">Actions</span>
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -129,6 +133,9 @@ export function FindingsTable({
               </TableCell>
               <TableCell className="py-3">
                 <StatusBadge status={f.status} />
+              </TableCell>
+              <TableCell className="py-3 text-right">
+                <FindingActions findingId={f.id} />
               </TableCell>
             </TableRow>
           ))}
