@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Flame, Search } from "lucide-react";
-import { findings, type Severity } from "@/lib/findings";
+import type { Finding, Severity } from "@/lib/findings";
 import { SeverityBadge } from "@/components/severity-badge";
 import { StatusBadge } from "@/components/status-badge";
 import { RiskMeter } from "@/components/risk-meter";
@@ -31,7 +31,13 @@ const SEVERITY_OPTIONS: Array<{ value: string; label: string }> = [
   { value: "LOW", label: "Low" },
 ];
 
-export function FindingsTable() {
+export function FindingsTable({
+  findings,
+  loading,
+}: {
+  findings: Finding[];
+  loading?: boolean;
+}) {
   const [query, setQuery] = useState("");
   const [severity, setSeverity] = useState("ALL");
 
@@ -47,7 +53,7 @@ export function FindingsTable() {
           .includes(q);
       })
       .sort((a, b) => b.riskScore - a.riskScore);
-  }, [query, severity]);
+  }, [findings, query, severity]);
 
   return (
     <div className="rounded-xl border bg-card">
@@ -131,7 +137,7 @@ export function FindingsTable() {
 
       {rows.length === 0 && (
         <div className="p-10 text-center text-sm text-muted-foreground">
-          No findings match your filters.
+          {loading ? "Loading findings…" : "No findings match your filters."}
         </div>
       )}
     </div>

@@ -2,7 +2,9 @@ packages:
   - "apps/*"
   - "packages/*"
 
-# Native post-install build scripts are declined; not needed for dev/typecheck.
+# Native/telemetry post-install build scripts are declined; not needed here.
 allowBuilds:
+  "@scarf/scarf": false
+  esbuild: false
   sharp: false
   unrs-resolver: false
