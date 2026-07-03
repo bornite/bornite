@@ -2,7 +2,7 @@ import { CollectionMode, Connector, NormalizedRecord, SyncContext } from '../../
 import { SourceType } from '../../../../domain';
 import { CheckmarxScaClient } from './checkmarx-sca.client';
 import { parseCheckmarxScaConfig } from './checkmarx-sca.config';
-import { toNormalizedRecord } from './checkmarx-sca.mapper';
+import { toCheckmarxScaRecord } from './checkmarx-sca.mapper';
 import { CheckmarxPackage } from './checkmarx-sca.types';
 
 /**
@@ -37,7 +37,7 @@ export class CheckmarxScaConnector implements Connector {
       );
 
       for (const vulnerability of await client.listVulnerabilities(reportId)) {
-        yield toNormalizedRecord(
+        yield toCheckmarxScaRecord(
           project,
           vulnerability,
           packagesById.get(vulnerability.packageId) ?? null,

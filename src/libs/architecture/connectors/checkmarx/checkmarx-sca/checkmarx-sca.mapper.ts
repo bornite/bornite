@@ -31,7 +31,7 @@ function parseCwe(cwe: string | undefined): number[] | undefined {
  * Note: Checkmarx returns a structured `cvss` object rather than a vector string,
  * so we carry the numeric `score` and leave the CVSS vector unset.
  */
-export function toNormalizedRecord(
+export function toCheckmarxScaRecord(
   project: CheckmarxProject,
   vulnerability: CheckmarxVulnerability,
   pkg: CheckmarxPackage | null,
