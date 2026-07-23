@@ -13,4 +13,7 @@ export interface FindingRepository extends Repository<Finding, FindingId> {
 
   /** All findings recorded against an asset. */
   findByAsset(assetId: AssetId): Promise<Finding[]>;
+
+  /** Every finding, for bulk operations such as priority re-evaluation. */
+  findAll(): Promise<Finding[]>;
 }

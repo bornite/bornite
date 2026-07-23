@@ -4,6 +4,7 @@ import {
   AssetEntity,
   FindingEntity,
   FindingGroupEntity,
+  PrioritySchemeEntity,
   RiskAcceptanceEntity,
   ScanImportEntity,
   SourceEntity,
@@ -19,6 +20,7 @@ export const POSTGRES_ENTITIES = [
   AssessmentEntity,
   RiskAcceptanceEntity,
   FindingGroupEntity,
+  PrioritySchemeEntity,
 ];
 
 /**

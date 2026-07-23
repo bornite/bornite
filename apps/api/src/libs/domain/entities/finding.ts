@@ -1,9 +1,14 @@
+import { ASSET_CRITICALITY_WEIGHT } from '../enums/asset-criticality';
 import { ConfidenceLevel } from '../enums/confidence-level';
 import { ACTIVE_STATUSES, FindingStatus } from '../enums/finding-status';
 import {
   FindingFingerprintInput,
   FindingFingerprintStrategy,
 } from '../services/finding-fingerprint-strategy';
+import type {
+  PriorityEvaluationContext,
+  PriorityEvaluationStrategy,
+} from '../services/priority-evaluation-strategy';
 import { RiskScoringContext, RiskScoringStrategy } from '../services/risk-scoring-strategy';
 import { AggregateRoot } from '../shared/aggregate-root';
 import { IllegalStateTransitionError } from '../shared/domain-error';
@@ -18,10 +23,13 @@ import {
 } from '../shared/identifiers';
 import { parse } from '../shared/parse';
 import { nonEmptyString } from '../shared/schemas';
+import type { FindingFacts } from '../value-objects/finding-facts';
 import { FindingFingerprint } from '../value-objects/finding-fingerprint';
 import { FindingLocation } from '../value-objects/finding-location';
+import { PriorityAssignment } from '../value-objects/priority-assignment';
 import { RiskScore } from '../value-objects/risk-score';
 import { Severity } from '../value-objects/severity';
+import type { PriorityScheme } from './priority-scheme';
 
 export interface FindingProps {
   // Cross-aggregate references (by id).
@@ -37,6 +45,7 @@ export interface FindingProps {
   severity: Severity;
   confidence: ConfidenceLevel | null;
   riskScore: RiskScore | null;
+  priority: PriorityAssignment | null;
   location: FindingLocation | null;
   fingerprint: FindingFingerprint | null;
 
@@ -111,6 +120,7 @@ export class Finding extends AggregateRoot<FindingProps> {
         severity: input.severity,
         confidence: input.confidence ?? null,
         riskScore: null,
+        priority: null,
         location: input.location ?? null,
         fingerprint: null,
         uniqueIdFromTool: input.uniqueIdFromTool?.trim() || null,
@@ -165,6 +175,10 @@ export class Finding extends AggregateRoot<FindingProps> {
 
   public get riskScore(): RiskScore | null {
     return this.props.riskScore;
+  }
+
+  public get priority(): PriorityAssignment | null {
+    return this.props.priority;
   }
 
   public get location(): FindingLocation | null {
@@ -229,6 +243,53 @@ export class Finding extends AggregateRoot<FindingProps> {
       confidence: this.props.confidence,
       ...context,
     });
+  }
+
+  /**
+   * (Re)evaluate this finding's priority against a {@link PriorityScheme} via an
+   * injected {@link PriorityEvaluationStrategy}. The finding contributes its own
+   * facts (severity, status, confidence, risk score); external facts (CVSS, EPSS,
+   * KEV, asset) are supplied via `context`. Records which level/rule decided it and
+   * the scheme version, so staleness can be detected after a scheme revision.
+   */
+  public applyPriority(
+    strategy: PriorityEvaluationStrategy,
+    scheme: PriorityScheme,
+    context: PriorityEvaluationContext,
+    now: Date,
+  ): void {
+    const decision = strategy.evaluate(scheme, this.buildFacts(context));
+    this.props.priority = PriorityAssignment.of({
+      levelKey: decision.levelKey,
+      rank: decision.rank,
+      matchedRuleId: decision.matchedRuleId,
+      schemeVersion: scheme.version,
+      evaluatedAt: now,
+    });
+  }
+
+  /** Assemble the flat fact vocabulary the rule engine evaluates against. */
+  private buildFacts(context: PriorityEvaluationContext): FindingFacts {
+    return {
+      'finding.status': this.props.status,
+      'finding.confidence': this.props.confidence,
+      'finding.riskScore': this.props.riskScore ? this.props.riskScore.value : null,
+      'finding.title': this.props.title,
+      'severity.level': this.props.severity.level,
+      'severity.rank': this.props.severity.rank,
+      'cvss.baseScore': context.cvssBaseScore,
+      'epss.probability': context.epssProbability,
+      'epss.percentile': context.epssPercentile,
+      'vuln.knownExploited': context.knownExploited,
+      'vuln.ransomware': context.ransomware,
+      'vuln.fixAvailable': context.fixAvailable,
+      'vuln.cve': context.cve,
+      'vuln.cwes': context.cwes,
+      'asset.type': context.assetType,
+      'asset.criticality': context.assetCriticality,
+      'asset.criticalityWeight': ASSET_CRITICALITY_WEIGHT[context.assetCriticality],
+      'asset.tags': context.assetTags,
+    };
   }
 
   public changeSeverity(severity: Severity): void {

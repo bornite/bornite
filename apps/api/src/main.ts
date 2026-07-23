@@ -2,6 +2,7 @@ import 'dotenv/config';
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { EnsureDefaultPriorityScheme } from './libs/application';
 import { AppModule } from './app.module';
 import { DomainExceptionFilter } from './libs/architecture/http/filters/domain-exception.filter';
 
@@ -10,6 +11,9 @@ async function bootstrap(): Promise<void> {
   // Allow the web app (and other clients) to call the API during development.
   app.enableCors();
   app.useGlobalFilters(new DomainExceptionFilter());
+
+  // Guarantee a priority scheme exists so findings can be prioritized out of the box.
+  await app.get(EnsureDefaultPriorityScheme).execute();
 
   const config = new DocumentBuilder()
     .setTitle('Bornite API')

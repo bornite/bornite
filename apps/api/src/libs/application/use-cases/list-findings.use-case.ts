@@ -11,6 +11,9 @@ export class ListFindings {
 
   public async execute(): Promise<FindingListItem[]> {
     const items = await this.findings.listWorklist();
-    return [...items].sort((a, b) => b.riskScore - a.riskScore);
+    // Primary sort: configured priority rank (higher = more urgent); tie-break on
+    // risk score. Findings not yet prioritized fall back to pure risk ordering.
+    const rank = (item: FindingListItem): number => item.priority?.rank ?? -1;
+    return [...items].sort((a, b) => rank(b) - rank(a) || b.riskScore - a.riskScore);
   }
 }

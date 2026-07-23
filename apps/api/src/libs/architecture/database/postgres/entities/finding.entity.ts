@@ -47,6 +47,22 @@ export class FindingEntity {
   @Column({ name: 'risk_score', type: 'double precision', nullable: true })
   riskScore!: number | null;
 
+  @Column({ name: 'priority_level_key', type: 'varchar', length: 16, nullable: true })
+  priorityLevelKey!: string | null;
+
+  @Index('idx_findings_priority_rank')
+  @Column({ name: 'priority_rank', type: 'integer', nullable: true })
+  priorityRank!: number | null;
+
+  @Column({ name: 'priority_matched_rule_id', type: 'varchar', length: 128, nullable: true })
+  priorityMatchedRuleId!: string | null;
+
+  @Column({ name: 'priority_scheme_version', type: 'integer', nullable: true })
+  prioritySchemeVersion!: number | null;
+
+  @Column({ name: 'priority_evaluated_at', type: 'timestamptz', nullable: true })
+  priorityEvaluatedAt!: Date | null;
+
   @Column({ type: 'jsonb', nullable: true })
   location!: FindingLocationRecord | null;
 

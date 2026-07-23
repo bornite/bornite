@@ -7,6 +7,9 @@ interface WorklistRow {
   severity: string;
   status: string;
   risk_score: number | null;
+  priority_level_key: string | null;
+  priority_rank: number | null;
+  priority_matched_rule_id: string | null;
   first_detected_at: Date;
   last_detected_at: Date;
   asset_name: string;
@@ -27,6 +30,7 @@ interface WorklistRow {
  */
 const WORKLIST_SQL = `
   SELECT f.id, f.title, f.severity, f.status, f.risk_score,
+         f.priority_level_key, f.priority_rank, f.priority_matched_rule_id,
          f.first_detected_at, f.last_detected_at,
          a.name AS asset_name, a.type AS asset_type,
          vd.identifiers AS vuln_identifiers, vd.cwes AS vuln_cwes,
@@ -36,7 +40,7 @@ const WORKLIST_SQL = `
   JOIN assets a ON a.id = f.asset_id
   JOIN vulnerability_definitions vd ON vd.id = f.vulnerability_definition_id
   JOIN sources s ON s.id = f.source_id
-  ORDER BY f.risk_score DESC NULLS LAST
+  ORDER BY f.priority_rank DESC NULLS LAST, f.risk_score DESC NULLS LAST
 `;
 
 export class PostgresFindingReadStore implements FindingReadStore {
@@ -65,6 +69,14 @@ export class PostgresFindingReadStore implements FindingReadStore {
       cwe,
       epss: row.vuln_epss?.probability,
       knownExploited: row.vuln_known_exploited,
+      priority:
+        row.priority_level_key === null || row.priority_rank === null
+          ? null
+          : {
+              levelKey: row.priority_level_key,
+              rank: row.priority_rank,
+              matchedDefault: row.priority_matched_rule_id === null,
+            },
       firstSeen: new Date(row.first_detected_at).toISOString().slice(0, 10),
       lastSeen: new Date(row.last_detected_at).toISOString().slice(0, 10),
     };

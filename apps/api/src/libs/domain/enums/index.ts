@@ -2,6 +2,7 @@ export * from './assessment-status';
 export * from './asset-criticality';
 export * from './asset-identifier-kind';
 export * from './asset-type';
+export * from './condition-operator';
 export * from './confidence-level';
 export * from './finding-group-by';
 export * from './finding-status';

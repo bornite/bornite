@@ -3,14 +3,20 @@ import { DataSource } from 'typeorm';
 import {
   FINDING_READ_STORE,
   FINDING_REPOSITORY,
+  PRIORITY_SCHEME_REPOSITORY,
   RISK_ACCEPTANCE_REPOSITORY,
 } from '../../application';
-import { InMemoryFindingStore, InMemoryRiskAcceptanceRepository } from '../database/in-memory';
+import {
+  InMemoryFindingStore,
+  InMemoryPrioritySchemeRepository,
+  InMemoryRiskAcceptanceRepository,
+} from '../database/in-memory';
 import { createDataSource } from '../database/postgres/data-source';
-import { FindingEntity, RiskAcceptanceEntity } from '../database/postgres/entities';
+import { FindingEntity, PrioritySchemeEntity, RiskAcceptanceEntity } from '../database/postgres/entities';
 import { PostgresFindingReadStore } from '../database/postgres/read-stores';
 import {
   PostgresFindingRepository,
+  PostgresPrioritySchemeRepository,
   PostgresRiskAcceptanceRepository,
 } from '../database/postgres/repositories';
 import { seedIfEmpty } from '../database/postgres/seed';
@@ -18,7 +24,12 @@ import { CryptoIdGenerator, SystemClock } from '../system';
 
 const DATA_SOURCE = Symbol('DataSource');
 
-const PERSISTENCE_EXPORTS = [FINDING_READ_STORE, FINDING_REPOSITORY, RISK_ACCEPTANCE_REPOSITORY];
+const PERSISTENCE_EXPORTS = [
+  FINDING_READ_STORE,
+  FINDING_REPOSITORY,
+  RISK_ACCEPTANCE_REPOSITORY,
+  PRIORITY_SCHEME_REPOSITORY,
+];
 
 /**
  * Selects the persistence adapters at composition time: Postgres when
@@ -40,6 +51,8 @@ function memoryProviders(): Provider[] {
     { provide: FINDING_REPOSITORY, useExisting: InMemoryFindingStore },
     InMemoryRiskAcceptanceRepository,
     { provide: RISK_ACCEPTANCE_REPOSITORY, useExisting: InMemoryRiskAcceptanceRepository },
+    InMemoryPrioritySchemeRepository,
+    { provide: PRIORITY_SCHEME_REPOSITORY, useExisting: InMemoryPrioritySchemeRepository },
   ];
 }
 
@@ -69,6 +82,12 @@ function postgresProviders(): Provider[] {
       provide: RISK_ACCEPTANCE_REPOSITORY,
       useFactory: (dataSource: DataSource) =>
         new PostgresRiskAcceptanceRepository(dataSource.getRepository(RiskAcceptanceEntity)),
+      inject: [DATA_SOURCE],
+    },
+    {
+      provide: PRIORITY_SCHEME_REPOSITORY,
+      useFactory: (dataSource: DataSource) =>
+        new PostgresPrioritySchemeRepository(dataSource.getRepository(PrioritySchemeEntity)),
       inject: [DATA_SOURCE],
     },
   ];

@@ -2,6 +2,7 @@ export * from './assessment-repository';
 export * from './asset-repository';
 export * from './finding-group-repository';
 export * from './finding-repository';
+export * from './priority-scheme-repository';
 export * from './repository';
 export * from './risk-acceptance-repository';
 export * from './scan-import-repository';

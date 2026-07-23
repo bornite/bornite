@@ -5,26 +5,38 @@ import {
   Clock,
   CONNECTOR_CATALOG,
   ConnectorCatalog,
+  EnsureDefaultPriorityScheme,
   FINDING_READ_STORE,
   FINDING_REPOSITORY,
   FindingReadStore,
+  GetActivePriorityScheme,
   ID_GENERATOR,
   IdGenerator,
   ListConnectors,
   ListFindings,
   ListSources,
   MitigateFinding,
+  PRIORITY_EVALUATION_STRATEGY,
+  PRIORITY_SCHEME_REPOSITORY,
+  PreviewRuleCondition,
   RegisterSource,
+  RevisePriorityScheme,
   RISK_ACCEPTANCE_REPOSITORY,
   SOURCE_REGISTRY,
   SourceRegistry,
 } from '../../application';
-import { FindingRepository, RiskAcceptanceRepository } from '../../domain';
+import {
+  DefaultPriorityEvaluationStrategy,
+  FindingRepository,
+  PrioritySchemeRepository,
+  RiskAcceptanceRepository,
+} from '../../domain';
 import { PersistenceModule } from '../persistence';
 import { InMemorySourceRegistry, StaticConnectorCatalog } from '../sources';
 import { CryptoIdGenerator, SystemClock } from '../system';
 import { FindingsController } from './controllers/findings.controller';
 import { HealthController } from './controllers/health.controller';
+import { PrioritySchemeController } from './controllers/priority-scheme.controller';
 import { SourcesController } from './controllers/sources.controller';
 
 /**
@@ -35,7 +47,7 @@ import { SourcesController } from './controllers/sources.controller';
  */
 @Module({
   imports: [PersistenceModule.register()],
-  controllers: [FindingsController, HealthController, SourcesController],
+  controllers: [FindingsController, HealthController, PrioritySchemeController, SourcesController],
   providers: [
     { provide: ID_GENERATOR, useClass: CryptoIdGenerator },
     { provide: CLOCK, useClass: SystemClock },
@@ -83,6 +95,36 @@ import { SourcesController } from './controllers/sources.controller';
         clock: Clock,
       ): RegisterSource => new RegisterSource(catalog, registry, ids, clock),
       inject: [CONNECTOR_CATALOG, SOURCE_REGISTRY, ID_GENERATOR, CLOCK],
+    },
+
+    {
+      provide: PRIORITY_EVALUATION_STRATEGY,
+      useFactory: (): DefaultPriorityEvaluationStrategy => new DefaultPriorityEvaluationStrategy(),
+    },
+    {
+      provide: GetActivePriorityScheme,
+      useFactory: (schemes: PrioritySchemeRepository): GetActivePriorityScheme =>
+        new GetActivePriorityScheme(schemes),
+      inject: [PRIORITY_SCHEME_REPOSITORY],
+    },
+    {
+      provide: RevisePriorityScheme,
+      useFactory: (schemes: PrioritySchemeRepository, clock: Clock): RevisePriorityScheme =>
+        new RevisePriorityScheme(schemes, clock),
+      inject: [PRIORITY_SCHEME_REPOSITORY, CLOCK],
+    },
+    {
+      provide: EnsureDefaultPriorityScheme,
+      useFactory: (
+        schemes: PrioritySchemeRepository,
+        ids: IdGenerator,
+        clock: Clock,
+      ): EnsureDefaultPriorityScheme => new EnsureDefaultPriorityScheme(schemes, ids, clock),
+      inject: [PRIORITY_SCHEME_REPOSITORY, ID_GENERATOR, CLOCK],
+    },
+    {
+      provide: PreviewRuleCondition,
+      useFactory: (): PreviewRuleCondition => new PreviewRuleCondition(),
     },
   ],
 })

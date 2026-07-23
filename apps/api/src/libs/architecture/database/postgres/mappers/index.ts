@@ -3,6 +3,7 @@ export * from './asset.mapper';
 export * from './finding-group.mapper';
 export * from './finding.mapper';
 export * from './mapper';
+export * from './priority-scheme.mapper';
 export * from './risk-acceptance.mapper';
 export * from './scan-import.mapper';
 export * from './source.mapper';

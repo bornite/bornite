@@ -10,3 +10,5 @@ export const CONNECTOR_CATALOG = Symbol('ConnectorCatalog');
 export const SOURCE_REGISTRY = Symbol('SourceRegistry');
 export const ID_GENERATOR = Symbol('IdGenerator');
 export const CLOCK = Symbol('Clock');
+export const PRIORITY_SCHEME_REPOSITORY = Symbol('PrioritySchemeRepository');
+export const PRIORITY_EVALUATION_STRATEGY = Symbol('PriorityEvaluationStrategy');

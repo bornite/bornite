@@ -10,6 +10,9 @@ import {
   FindingLocation,
   FindingRepository,
   ImportCounts,
+  PriorityEvaluationStrategy,
+  PriorityScheme,
+  PrioritySchemeRepository,
   RiskScoringStrategy,
   ScanImport,
   Severity,
@@ -20,6 +23,7 @@ import {
 } from '../../domain';
 import { Clock } from '../ports/clock';
 import { IdGenerator } from '../ports/id-generator';
+import { buildPriorityEvaluationContext } from '../priority/priority-context';
 import {
   NormalizedAsset,
   NormalizedFinding,
@@ -50,6 +54,8 @@ export class IngestionService {
     private readonly findings: FindingRepository,
     private readonly fingerprintStrategy: FindingFingerprintStrategy,
     private readonly riskScoring: RiskScoringStrategy,
+    private readonly priorityScheme: PrioritySchemeRepository,
+    private readonly priorityEvaluation: PriorityEvaluationStrategy,
     private readonly ids: IdGenerator,
     private readonly clock: Clock,
   ) {}
@@ -57,6 +63,9 @@ export class IngestionService {
   public async ingest(params: IngestParams): Promise<ImportCounts> {
     const { source, scanImport, assessmentId, records, reconcileMode } = params;
     const now = this.clock.now();
+    // Load the active scheme once for the whole import; null = no scheme configured
+    // yet, in which case findings are scored but left un-prioritized.
+    const scheme = await this.priorityScheme.findActive();
     const counts: ImportCounts = { created: 0, reactivated: 0, closed: 0, untouched: 0 };
     const seenByAsset = new Map<string, Set<string>>();
 
@@ -77,6 +86,7 @@ export class IngestionService {
       let finding: Finding;
       if (existing === null) {
         this.score(candidate, definition, asset);
+        this.prioritize(candidate, definition, asset, scheme, now);
         await this.findings.save(candidate);
         finding = candidate;
         counts.created += 1;
@@ -84,6 +94,7 @@ export class IngestionService {
         const wasActive = existing.isActive();
         existing.recordRedetection(scanImport.id, now);
         this.score(existing, definition, asset);
+        this.prioritize(existing, definition, asset, scheme, now);
         await this.findings.save(existing);
         finding = existing;
         if (!wasActive && existing.isActive()) {
@@ -187,6 +198,19 @@ export class IngestionService {
       knownExploited: definition.knownExploited,
       assetCriticality: asset.criticality,
     });
+  }
+
+  private prioritize(
+    finding: Finding,
+    definition: VulnerabilityDefinition,
+    asset: Asset,
+    scheme: PriorityScheme | null,
+    now: Date,
+  ): void {
+    if (scheme === null) {
+      return;
+    }
+    finding.applyPriority(this.priorityEvaluation, scheme, buildPriorityEvaluationContext(definition, asset), now);
   }
 
   private async resolveMissing(

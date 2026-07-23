@@ -1,5 +1,6 @@
 import {
   AssetIdentifierKind,
+  RuleConditionData,
   VulnerabilitySystem,
 } from '../../../../domain';
 
@@ -48,4 +49,20 @@ export interface ImportCountsRecord {
   reactivated: number;
   closed: number;
   untouched: number;
+}
+
+export interface PriorityLevelRecord {
+  key: string;
+  label: string;
+  rank: number;
+  color: string | null;
+  slaDays: number | null;
+}
+
+export interface PriorityRuleRecord {
+  id: string;
+  name: string;
+  levelKey: string;
+  enabled: boolean;
+  condition: RuleConditionData;
 }

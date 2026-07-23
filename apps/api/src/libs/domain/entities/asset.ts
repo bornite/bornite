@@ -82,6 +82,10 @@ export class Asset extends AggregateRoot<AssetProps> {
     return this.props.criticality;
   }
 
+  public get tags(): readonly string[] {
+    return this.props.tags;
+  }
+
   public get identifiers(): readonly AssetIdentifier[] {
     return this.props.identifiers;
   }

@@ -29,6 +29,15 @@ export type SourceType =
   | 'CSPM'
   | 'CONTAINER_SCANNER';
 
+export interface FindingPriority {
+  /** The assigned level's key (e.g. "P0"). */
+  levelKey: string;
+  /** The level's urgency rank (higher = more urgent); the worklist's primary sort key. */
+  rank: number;
+  /** True when the finding fell through to the scheme's default level. */
+  matchedDefault: boolean;
+}
+
 export interface FindingListItem {
   id: string;
   title: string;
@@ -42,6 +51,8 @@ export interface FindingListItem {
   cwe?: number;
   epss?: number;
   knownExploited: boolean;
+  /** Customer-configured priority, or null/undefined if not yet evaluated. */
+  priority?: FindingPriority | null;
   firstSeen: string;
   lastSeen: string;
 }

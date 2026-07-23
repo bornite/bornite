@@ -126,6 +126,7 @@ export async function seedIfEmpty(dataSource: DataSource, ids: IdGenerator, cloc
         severity: Severity.of(seed.severity),
         confidence: null,
         riskScore: RiskScore.of(seed.riskScore),
+        priority: null,
         location: null,
         fingerprint: null,
         uniqueIdFromTool: null,

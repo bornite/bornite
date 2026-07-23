@@ -3,6 +3,7 @@ export * from './asset.repository';
 export * from './finding-group.repository';
 export * from './finding.repository';
 export * from './postgres.repository';
+export * from './priority-scheme.repository';
 export * from './risk-acceptance.repository';
 export * from './scan-import.repository';
 export * from './source.repository';

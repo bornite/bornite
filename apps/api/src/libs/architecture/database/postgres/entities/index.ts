@@ -2,6 +2,7 @@ export * from './assessment.entity';
 export * from './asset.entity';
 export * from './finding-group.entity';
 export * from './finding.entity';
+export * from './priority-scheme.entity';
 export * from './records';
 export * from './risk-acceptance.entity';
 export * from './scan-import.entity';

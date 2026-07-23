@@ -14,3 +14,5 @@ export type ScanImportId = string;
 export type AssessmentId = string;
 export type RiskAcceptanceId = string;
 export type FindingGroupId = string;
+export type PrioritySchemeId = string;
+export type PriorityRuleId = string;

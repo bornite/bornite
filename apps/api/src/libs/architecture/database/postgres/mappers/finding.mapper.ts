@@ -2,6 +2,7 @@ import {
   Finding,
   FindingFingerprint,
   FindingLocation,
+  PriorityAssignment,
   RiskScore,
   Severity,
 } from '../../../../domain';
@@ -22,6 +23,19 @@ export class FindingMapper implements Mapper<Finding, FindingEntity> {
         severity: Severity.of(row.severity),
         confidence: row.confidence,
         riskScore: row.riskScore === null ? null : RiskScore.of(row.riskScore),
+        priority:
+          row.priorityLevelKey === null ||
+          row.priorityRank === null ||
+          row.prioritySchemeVersion === null ||
+          row.priorityEvaluatedAt === null
+            ? null
+            : PriorityAssignment.of({
+                levelKey: row.priorityLevelKey,
+                rank: row.priorityRank,
+                matchedRuleId: row.priorityMatchedRuleId,
+                schemeVersion: row.prioritySchemeVersion,
+                evaluatedAt: row.priorityEvaluatedAt,
+              }),
         location: row.location === null ? null : FindingLocation.reconstitute(row.location),
         fingerprint: row.fingerprint === null ? null : FindingFingerprint.of(row.fingerprint),
         uniqueIdFromTool: row.uniqueIdFromTool,
@@ -52,6 +66,11 @@ export class FindingMapper implements Mapper<Finding, FindingEntity> {
     row.severity = s.severity.level;
     row.confidence = s.confidence;
     row.riskScore = s.riskScore === null ? null : s.riskScore.value;
+    row.priorityLevelKey = s.priority?.levelKey ?? null;
+    row.priorityRank = s.priority?.rank ?? null;
+    row.priorityMatchedRuleId = s.priority ? s.priority.matchedRuleId : null;
+    row.prioritySchemeVersion = s.priority?.schemeVersion ?? null;
+    row.priorityEvaluatedAt = s.priority?.evaluatedAt ?? null;
     row.location =
       s.location === null
         ? null

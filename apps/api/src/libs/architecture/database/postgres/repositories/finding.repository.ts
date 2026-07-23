@@ -28,4 +28,9 @@ export class PostgresFindingRepository
     const rows = await this.repository.findBy({ assetId } as FindOptionsWhere<FindingEntity>);
     return rows.map((row) => this.mapper.toDomain(row));
   }
+
+  public async findAll(): Promise<Finding[]> {
+    const rows = await this.repository.find();
+    return rows.map((row) => this.mapper.toDomain(row));
+  }
 }

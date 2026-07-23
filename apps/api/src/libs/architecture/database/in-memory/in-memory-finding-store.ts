@@ -136,6 +136,7 @@ function buildFinding(seed: Seed): Finding {
       severity: Severity.of(seed.severity),
       confidence: null,
       riskScore: RiskScore.of(seed.riskScore),
+      priority: null,
       location: null,
       fingerprint: null,
       uniqueIdFromTool: null,
@@ -183,6 +184,13 @@ export class InMemoryFindingStore implements FindingReadStore, FindingRepository
       cwe: display.cwe,
       epss: display.epss,
       knownExploited: display.knownExploited,
+      priority: finding.priority
+        ? {
+            levelKey: finding.priority.levelKey,
+            rank: finding.priority.rank,
+            matchedDefault: finding.priority.matchedDefault,
+          }
+        : null,
       firstSeen: display.firstSeen,
       lastSeen: display.lastSeen,
     }));
@@ -220,5 +228,9 @@ export class InMemoryFindingStore implements FindingReadStore, FindingRepository
     return [...this.records.values()]
       .map((record) => record.finding)
       .filter((finding) => finding.assetId === assetId);
+  }
+
+  public async findAll(): Promise<Finding[]> {
+    return [...this.records.values()].map((record) => record.finding);
   }
 }
